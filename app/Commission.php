@@ -35,43 +35,57 @@ class Commission
     }
 
 
-
-    public function getCommission(array $operations)
+    /**
+     * Set operation data to calculate commission.
+     * @param array single|multi dimentional
+     * @return float|array final commission
+     */
+    public function setOperations(array $operations)
     {
-        $transactoins = [];
+        $finalCommision = [];
 
-        if (count($operations) > 1) {
+        if (count($operations) == count($operations, COUNT_RECURSIVE)) {
+            $this->operation = $operations;
+            $finalCommision[] = $this->calculateCommission();
+        } else {
             foreach ($operations as $operation) {
                 $this->operation = $operation;
-
-                $user_id = $operation['user_id'];
-                $operation_type = $operation['operation_type'];
-                $user_type = $operation['user_type'];
-
-                switch ($operation_type) {
-                    case 'deposit':
-                        $chargeable_amount = $total_amount = $operation['amount'];
-                        $commission = $chargeable_amount * $this->dipositCommission;
-                        break;
-
-                    case 'withdraw':
-                        if ($user_type == 'business') {
-                            $chargeable_amount = $total_amount = $operation['amount'];
-                            $commission = $chargeable_amount * $this->businessWithdrawCommission;
-                        } elseif ($user_type == 'private') {
-                            $commission = $this->calculatePrivateWithdraCommission();
-                        }
-                        break;
-
-                    default:
-                        throw new NotFoundResourceException('Invalid operation type!');
-                        break;
-                }
-
-                $commission = $this->getDecimalRoundValue($commission);
-                echo $commission . "\n";
+                $finalCommision[] = $this->calculateCommission();
             }
         }
+
+        return $finalCommision;
+    }
+
+    public function calculateCommission()
+    {
+        $operation = $this->operation;
+
+        $operationtype = $operation['operation_type'];
+        $user_type = $operation['user_type'];
+
+        switch ($operationtype) {
+            case 'deposit':
+                $chargeable_amount = $operation['amount'];
+                $commission = $chargeable_amount * $this->dipositCommission;
+                break;
+
+            case 'withdraw':
+                if ($user_type == 'business') {
+                    $chargeable_amount = $operation['amount'];
+                    $commission = $chargeable_amount * $this->businessWithdrawCommission;
+                } elseif ($user_type == 'private') {
+                    $commission = $this->calculatePrivateWithdraCommission();
+                }
+                break;
+
+            default:
+                throw new NotFoundResourceException('Invalid operation type!');
+                break;
+        }
+
+        $commission = $this->getDecimalRoundValue($commission);
+        return $commission;
     }
 
     public function calculatePrivateWithdraCommission(): float
@@ -83,26 +97,26 @@ class Commission
 
         $userId = $operation['user_id'];
 
-        //If currency is not EUR then need to convert
-        // if ($operation['currency'] != 'EUR') {
-        //     $exchangeDate = $this->getExchangeRate($operation['currency'], $operation['amount']);
-        //     $amount = $exchangeDate[0];
-        //     $exchangeRate = $exchangeDate[1];
-        // } else {
-        //     $amount = $operation['amount'];
-        //     $exchangeRate = 1;
-        // }
-
-        if ($operation['currency'] == 'USD') {
-            $exchangeRate = 1.1497;
-            $amount = $operation['amount'] / $exchangeRate;
-        } else if ($operation['currency'] == 'JPY') {
-            $exchangeRate = 129.53;
-            $amount = $operation['amount'] / $exchangeRate;
+        // If currency is not EUR then need to convert
+        if ($operation['currency'] != 'EUR') {
+            $exchangeDate = $this->getExchangeRate($operation['currency'], $operation['amount']);
+            $amount = $exchangeDate[0];
+            $exchangeRate = $exchangeDate[1];
         } else {
-            $exchangeRate = 1;
             $amount = $operation['amount'];
+            $exchangeRate = 1;
         }
+
+        // if ($operation['currency'] == 'USD') {
+        //     $exchangeRate = 1.1497;
+        //     $amount = $operation['amount'] / $exchangeRate;
+        // } else if ($operation['currency'] == 'JPY') {
+        //     $exchangeRate = 129.53;
+        //     $amount = $operation['amount'] / $exchangeRate;
+        // } else {
+        //     $exchangeRate = 1;
+        //     $amount = $operation['amount'];
+        // }
 
         if (!isset($transactoins[$userId])) {
             $transactoins[$userId] = [
@@ -162,7 +176,7 @@ class Commission
 
         if (empty($this->exchangeRateData)) {
             $apiRates = file_get_contents("https://developers.paysera.com/tasks/api/currency-exchange-rates");
-            $apiRates = !empty($rates) ? json_decode($apiRates, true) : [];
+            $apiRates = !empty($apiRates) ? json_decode($apiRates, true) : [];
             $this->exchangeRateData = $apiRates;
         }
 
@@ -173,6 +187,9 @@ class Commission
             $exchangeRate = $rates['rates'][$operationCurrency];
 
             $exchangeAmount = $operationAmount / (float) $exchangeRate;
+        } else {
+            $exchangeAmount = $operationAmount;
+            $exchangeRate = 1;
         }
 
         return [$exchangeAmount, $exchangeRate];
@@ -180,14 +197,15 @@ class Commission
 
     public function getDecimalRoundValue(float $number)
     {
-        if ($number == 0)
-            return sprintf("%0.2f", $number);
+        echo "number = $number \n";
+        $finalCommision = 0;
 
         $precision = $this->commissionDecimalPlace;
 
         $pow = pow(10, $precision);
-        $number = (ceil($pow * $number) + ceil($pow * $number - ceil($pow * $number))) / $pow;
 
-        return sprintf("%0.2f", $number);
+        $finalCommision = (ceil($pow * $number) + ceil($pow * $number - ceil($pow * $number))) / $pow;
+
+        return sprintf("%0.2f", $finalCommision);
     }
 }

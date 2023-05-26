@@ -11,14 +11,49 @@ use Symfony\Component\Translation\Exception\NotFoundResourceException;
 
 class parseInputData
 {
+    /**
+     * The operation file path
+     */
     private string $file;
+
+    /**
+     * Weather file is exist in the path
+     */
     private bool $isFileExists = false;
+
+    /**
+     * Weather file mime type is as expectation (text/csv)
+     */
     private bool $isFileTypeCorrect = false;
+
+    /**
+     * Weather user/client type is one of the 'private' or 'business'
+     */
     private bool $isClientTypeCorrect = false;
+
+    /**
+     * The operation type is one of the 'diposit' or 'withdraw'
+     */
     private bool $isOperationTypeCorrect = false;
+
+    /**
+     * The currency is correct or not
+     */
     private bool $isCurrencyTypeCorrect = false;
+
+    /**
+     * Allowd input file type
+     */
     private array $allowedFileTypes = ['text/csv'];
 
+    /**
+     * allowed currencies
+     */
+    private array $allowedCurrency = ['EUR', 'USD', 'JPY', 'BDT'];
+
+    /**
+     * Final perse data
+     */
     private array $parsedData;
 
 
@@ -27,17 +62,23 @@ class parseInputData
         $this->file = $file;
     }
 
+    /**
+     * Check the input file path is correct or not
+     */
     public function checkFileAvailability(): object
     {
         if (file_exists($this->file)) {
             $this->isFileExists = true;
         } else {
             throw new FileNotFoundException();
-            // throw new NotFoundResourceException("File not exists, please check the file path is correct or not.");
         }
         return $this;
     }
 
+    /**
+     * Check the file mime type is as expected
+     * @return bool
+     */
     public function checkFileType(): bool|array
     {
         if ($this->isFileExists) {
@@ -52,6 +93,11 @@ class parseInputData
         return $this->isFileTypeCorrect;
     }
 
+    /**
+     * Check client type is as expected or not.
+     * @param string $clientType
+     * @return bool
+     */
     public function checkClientType(string $clientType): bool
     {
         if ($clientType != 'private' && $clientType != 'business') {
@@ -63,10 +109,15 @@ class parseInputData
         return $this->isClientTypeCorrect;
     }
 
-    public function checkOperationType(string $operationTtype): bool
+    /**
+     * Check operation type is correct or not.
+     * @param string $operationType
+     * @return bool
+     */
+    public function checkOperationType(string $operationType): bool
     {
-        if ($operationTtype != 'deposit' && $operationTtype != 'withdraw') {
-            throw new NotFoundResourceException("Invalid operation type '$operationTtype'. Operation type should be one of 'deposit' or 'withdraw'");
+        if ($operationType != 'deposit' && $operationType != 'withdraw') {
+            throw new NotFoundResourceException("Invalid operation type '$operationType'. Operation type should be one of 'deposit' or 'withdraw'");
         } else {
             $this->isOperationTypeCorrect = true;
         }
@@ -74,10 +125,17 @@ class parseInputData
         return $this->isOperationTypeCorrect;
     }
 
+    /**
+     * Check operation currency is correct or not.
+     * @param string $currency
+     * @return bool
+     */
     public function checkOperationCurrency(string $currency): bool
     {
-        if ($currency != 'EUR' && $currency != 'USD' && $currency != 'JPY') {
-            throw new NotFoundResourceException("Invalid currency '$currency' provided. Currency should be one of 'EUR', 'USD', 'JPY'");
+        $allowedCurrency = $this->allowedCurrency;
+
+        if (!in_array($currency, $allowedCurrency)) {
+            throw new NotFoundResourceException("Invalid currency '$currency' provided. Currency should be one of " . implode(", ", $allowedCurrency));
         } else {
             $this->isCurrencyTypeCorrect = true;
         }
@@ -85,6 +143,10 @@ class parseInputData
         return $this->isCurrencyTypeCorrect;
     }
 
+    /**
+     * Parse input file data
+     * @return array
+     */
     public function getParsedData(): array
     {
 
