@@ -12,6 +12,7 @@ composer install
 composer dump-autoload
 ```
 ### Run script in command line
+Open terminal and go to project directory and run the following command
 ```
 php script.php input.csv
 ```
