@@ -2,7 +2,13 @@
 Calculation deposit &amp; withdraw commission of private &amp; business client.
 
 ### Installation 
-Clone the project and run the composer command
+Clone the project by the following command
+```
+git clone https://github.com/sirony/commission_calculation.git
+```
+Then run ```cd commission_calculation```
+
+And run the following composer command
 
 ```
 composer install
