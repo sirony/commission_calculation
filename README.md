@@ -23,11 +23,13 @@ Open terminal and go to project directory and run the following command
 php script.php input.csv
 ```
 ### Run script in command line and show execution time
+Open terminal and go to project directory and run the following command
 ```
 php script.php input.csv -t
 ```
 
 ### Run the command for unit test
+Open terminal and go to project directory and run the following command
 ```
-./vendor/bin/phpunit --testdox
+bin/phpunit --testdox
 ```
