@@ -4,7 +4,9 @@ Calculation deposit &amp; withdraw commission of private &amp; business client.
 ### Installation 
 Clone the project and run the composer command
 
-```composer install```
+```
+composer install
+```
 
 -- composer dump-autoload
 ### Run script in command line
