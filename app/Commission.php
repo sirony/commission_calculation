@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App;
 
-use App\Enums\ClientType;
 use Carbon\Carbon;
-use PhpParser\Node\Expr\Cast\Double;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 
 class Commission

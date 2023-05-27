@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App;
 
-use Carbon\Carbon;
 use Exception;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
