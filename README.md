@@ -19,9 +19,7 @@ composer dump-autoload
 ```
 ### Run script in command line
 Open terminal and go to project directory and run the following command
-```
-php script.php input.csv <or any csv file path>
-```
+```php script.php input.csv <or any csv file path>```
 ### Run script in command line and show execution time
 Open terminal and go to project directory and run the following command
 ```
