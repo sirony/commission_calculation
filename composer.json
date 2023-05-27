@@ -4,7 +4,8 @@
     "type": "project",
     "require": {
         "php": ">=8.1",
-        "nesbot/carbon": "^2.66"
+        "nesbot/carbon": "^2.66",
+        "carbon-cli/carbon-cli": "^1.2"
     },
     "authors": [
         {
@@ -19,12 +20,22 @@
     },
     "autoload": {
         "psr-4": {
-            "App\\" : "app/"
+            "App\\" : "app"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\" : "tests/"
+            "Tests\\" : "tests"
         }
+    },
+    "config": {
+        "sort-packages": true,
+        "bin-dir": "bin"
+    },
+    "scripts": {
+        "phpunit": "phpunit",
+        "fix-cs": "php-cs-fixer fix",
+        "test-cs": "php-cs-fixer fix --dry-run -v",
+        "test": ["@phpunit", "@test-cs"]
     }
 }

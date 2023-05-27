@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App;
 
 use App\Enums\ClientType;
+use Carbon\Carbon;
 use PhpParser\Node\Expr\Cast\Double;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 
@@ -35,6 +36,7 @@ class Commission
     }
 
 
+
     /**
      * Set operation data to calculate commission.
      * @param array single|multi dimentional
@@ -46,7 +48,7 @@ class Commission
 
         if (count($operations) == count($operations, COUNT_RECURSIVE)) {
             $this->operation = $operations;
-            $finalCommision[] = $this->calculateCommission();
+            $finalCommision = $this->calculateCommission();
         } else {
             foreach ($operations as $operation) {
                 $this->operation = $operation;
@@ -107,6 +109,8 @@ class Commission
             $exchangeRate = 1;
         }
 
+        $week = Carbon::parse($operation['date'])->startOfWeek(Carbon::MONDAY)->endOfWeek(Carbon::SUNDAY)->week();
+
         // if ($operation['currency'] == 'USD') {
         //     $exchangeRate = 1.1497;
         //     $amount = $operation['amount'] / $exchangeRate;
@@ -120,19 +124,19 @@ class Commission
 
         if (!isset($transactoins[$userId])) {
             $transactoins[$userId] = [
-                'week' => $operation['week'],
+                'week' => $week,
                 'count' => 1,
                 'amount' => $amount,
                 'total_amount' => $amount,
                 'this_week_charged' => false
             ];
         } else {
-            if ($transactoins[$userId]['week'] == $operation['week']) {
+            if ($transactoins[$userId]['week'] == $week) {
                 $transactoins[$userId]['count']++;
                 $transactoins[$userId]['amount'] = $amount;
                 $transactoins[$userId]['total_amount'] = ($transactoins[$userId]['total_amount'] + $amount);
             } else {
-                $transactoins[$userId]['week'] = $operation['week'];
+                $transactoins[$userId]['week'] = $week;
                 $transactoins[$userId]['count'] = 1;
                 $transactoins[$userId]['amount'] = $amount;
                 $transactoins[$userId]['total_amount'] = $amount;
@@ -197,7 +201,6 @@ class Commission
 
     public function getDecimalRoundValue(float $number)
     {
-        echo "number = $number \n";
         $finalCommision = 0;
 
         $precision = $this->commissionDecimalPlace;

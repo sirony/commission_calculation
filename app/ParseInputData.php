@@ -9,7 +9,7 @@ use Exception;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 
-class parseInputData
+class ParseInputData
 {
     /**
      * The operation file path
@@ -49,7 +49,18 @@ class parseInputData
     /**
      * allowed currencies
      */
-    private array $allowedCurrency = ['EUR', 'USD', 'JPY', 'BDT'];
+    private array $allowedCurrency = ['EUR', 'USD', 'JPY'];
+
+    /**
+     * allowed user type
+     */
+    private array $allowedUserType = ['private', 'business'];
+
+
+    /**
+     * allowed operation type
+     */
+    private array $allowedOperationType = ['deposit', 'withdraw'];
 
     /**
      * Final perse data
@@ -57,7 +68,7 @@ class parseInputData
     private array $parsedData;
 
 
-    public function __construct(string $file)
+    public function __construct(string|null $file = '')
     {
         $this->file = $file;
     }
@@ -100,7 +111,7 @@ class parseInputData
      */
     public function checkClientType(string $clientType): bool
     {
-        if ($clientType != 'private' && $clientType != 'business') {
+        if (!in_array($clientType, $this->allowedUserType)) {
             throw new NotFoundResourceException("Invalid user's type '$clientType'. User type should be one of 'private' or 'business'");
         } else {
             $this->isClientTypeCorrect = true;
@@ -116,7 +127,7 @@ class parseInputData
      */
     public function checkOperationType(string $operationType): bool
     {
-        if ($operationType != 'deposit' && $operationType != 'withdraw') {
+        if (!in_array($operationType, $this->allowedOperationType)) {
             throw new NotFoundResourceException("Invalid operation type '$operationType'. Operation type should be one of 'deposit' or 'withdraw'");
         } else {
             $this->isOperationTypeCorrect = true;
@@ -171,9 +182,7 @@ class parseInputData
 
 
                 $this->parsedData[] = [
-                    'date' => Carbon::parse($data[0])->format('Y-m-d'),
-                    'week' => Carbon::parse($data[0])->startOfWeek(Carbon::MONDAY)->endOfWeek(Carbon::SUNDAY)->week(),
-                    'day' => Carbon::parse($data[0])->weekday(),
+                    'date' => $data[0],
                     'user_id' => $data[1],
                     'user_type' => $data[2],
                     'operation_type' => $data[3],

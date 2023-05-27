@@ -18,35 +18,7 @@ try {
     $inputFile = new ParseInputData($argv[1]);
     $operations = $inputFile->getParsedData();
 
-    $newComm = new Commission();
-
-    // $number = $newComm->getDecimalRoundValue(0.6);
-    // echo "$number \n";
-    // $number = $newComm->getDecimalRoundValue(3);
-    // echo "$number \n";
-    // $number = $newComm->getDecimalRoundValue(0);
-    // echo "$number \n";
-    // $number = $newComm->getDecimalRoundValue(0.06);
-    // echo "$number \n";
-    // $number = $newComm->getDecimalRoundValue(1.5);
-    // echo "$number \n";
-    // $number = $newComm->getDecimalRoundValue(0);
-    // echo "$number \n";
-    // $number = $newComm->getDecimalRoundValue(0.69481973288041);
-    // echo "$number \n";
-    // $number = $newComm->getDecimalRoundValue(0.3);
-    // echo "$number \n";
-    // $number = $newComm->getDecimalRoundValue(0.3);
-    // echo "$number \n";
-    // $number = $newComm->getDecimalRoundValue(3);
-    // echo "$number \n";
-    // $number = $newComm->getDecimalRoundValue(0);
-    // echo "$number \n";
-    // $number = $newComm->getDecimalRoundValue(0);
-    // echo "$number \n";
-    // $number = $newComm->getDecimalRoundValue(8611.41);
-    // echo "$number \n-----------------";
-    // exit;
+    $newComm = new Commission;
 
     $finalCommission = $newComm->setOperations($operations);
 
